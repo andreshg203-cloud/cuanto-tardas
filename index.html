@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Descubre cuánto tiempo te tardas en comprarte una moto, un carro o un apartamento ahorrando de tu sueldo. Prepárate para el golpe de realidad.">
+    <meta name="theme-color" content="#0b0b0f">
+    <meta property="og:title" content="¿Cuánto tardas en comprarte eso que quieres?">
+    <meta property="og:description" content="Pon tu sueldo y descubre la verdad 😬">
+    <title>¿Cuánto tardas en comprarte...? 😬</title>
+    <style>
+        :root { --fondo:#0b0b0f; --card:#15151c; --borde:#2a2a35; --lima:#b6ff3b; --rosa:#ff3d81; --texto:#f4f4f6; --suave:#9a9aab; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { background:radial-gradient(circle at 50% -10%, #1d1d2b, var(--fondo) 60%) fixed; color:var(--texto);
+               font-family:system-ui, -apple-system, "Segoe UI", Arial, sans-serif; min-height:100vh; padding:32px 16px 60px; }
+        main { max-width:520px; margin:0 auto; }
+        h1 { font-size:clamp(28px, 8vw, 40px); line-height:1.1; text-align:center; }
+        h1 span { background:linear-gradient(90deg, var(--lima), var(--rosa)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+        .sub { text-align:center; color:var(--suave); margin:12px 0 28px; font-size:14px; }
+        form, .resultado { background:var(--card); border:1px solid var(--borde); border-radius:20px; padding:22px; }
+        label, legend { display:block; font-size:14px; color:var(--suave); margin:18px 0 8px; }
+        label:first-child { margin-top:0; }
+        input[type=text], input[type=number] { width:100%; background:#0f0f15; border:2px solid var(--borde); border-radius:12px;
+               color:var(--texto); font-size:18px; padding:14px; }
+        input[type=text]:focus, input[type=number]:focus { outline:none; border-color:var(--lima); }
+        input[type=range] { width:100%; accent-color:var(--lima); }
+        fieldset { border:0; }
+        .chips { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+        .chip { position:relative; margin:0; }
+        .chip:last-child { grid-column:1 / -1; }
+        .chip input { position:absolute; opacity:0; inset:0; cursor:pointer; }
+        .chip span { display:block; text-align:center; padding:14px 8px; border:2px solid var(--borde); border-radius:14px;
+               color:var(--texto); font-size:14px; transition:.2s; }
+        .chip small { display:block; color:var(--suave); margin-top:4px; font-size:12px; }
+        .chip input:checked + span { border-color:var(--lima); background:rgba(182,255,59,.1); }
+        .chip input:focus-visible + span { outline:3px solid var(--lima); outline-offset:2px; }
+        .btn { width:100%; margin-top:22px; padding:16px; border:0; border-radius:14px; font-size:17px; font-weight:800; cursor:pointer;
+               background:linear-gradient(90deg, var(--lima), #7dff6a); color:#0b0b0f; transition:transform .15s; }
+        .btn:hover { transform:translateY(-2px); }
+        .btn-sec { background:transparent; border:2px solid var(--lima); color:var(--lima); margin-top:12px; }
+        .btn:focus-visible { outline:3px solid #fff; outline-offset:3px; }
+        .error { color:var(--rosa); font-size:14px; min-height:18px; margin-top:12px; text-align:center; }
+        .resultado { margin-top:22px; text-align:center; }
+        .resultado.mostrar { animation:aparecer .6s ease; }
+        .res-intro { color:var(--suave); font-size:15px; }
+        .res-numero { font-size:clamp(56px, 18vw, 96px); font-weight:900; line-height:1.05; margin:8px 0;
+               background:linear-gradient(90deg, var(--lima), var(--rosa)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+        .res-numero small { font-size:.35em; }
+        .res-extra { font-size:17px; margin-top:6px; }
+        .res-chiste { font-size:20px; font-weight:700; margin:18px 0 4px; }
+        @keyframes aparecer { from { opacity:0; transform:translateY(24px) scale(.97); } to { opacity:1; transform:none; } }
+        @media (prefers-reduced-motion: reduce) { * { animation:none !important; transition:none !important; } }
+    </style>
+</head>
+<body>
+<main>
+    <h1>¿Cuánto tardas en <span>comprarte</span> eso que quieres?</h1>
+    <p class="sub">Pon tu sueldo y descubre la verdad 😬<br>Tus datos no se guardan ni se envían a ningún lado.</p>
+
+    <form id="form" novalidate>
+        <label for="sueldo">Tu sueldo mensual (en pesos)</label>
+        <input type="text" id="sueldo" inputmode="numeric" placeholder="1.750.000" autocomplete="off">
+
+        <label for="pct">¿Cuánto puedes ahorrar de ese sueldo? <strong id="pctTxt">20%</strong></label>
+        <input type="range" id="pct" min="5" max="60" step="5" value="20">
+
+        <fieldset>
+            <legend>¿Qué quieres comprarte?</legend>
+            <div class="chips" id="chips"></div>
+        </fieldset>
+
+        <div id="precioBox">
+            <label for="precio" id="precioLabel">¿Cuánto cuesta?</label>
+            <input type="text" id="precio" inputmode="numeric" placeholder="12.000.000" autocomplete="off">
+        </div>
+
+        <label for="edad">Tu edad (opcional, para el golpe final)</label>
+        <input type="number" id="edad" min="14" max="99" inputmode="numeric" placeholder="22">
+
+        <button type="submit" class="btn">Calcular 😬</button>
+        <p class="error" id="error" role="alert"></p>
+    </form>
+
+    <section class="resultado" id="resultado" hidden aria-live="polite">
+        <p class="res-intro" id="resIntro"></p>
+        <p class="res-numero"><span id="num">0</span> <small id="unidad"></small></p>
+        <p class="res-extra" id="resExtra"></p>
+        <p class="res-extra" id="resEdad"></p>
+        <p class="res-chiste" id="resChiste"></p>
+        <button type="button" class="btn" id="compartir">Compartir 📲</button>
+        <button type="button" class="btn btn-sec" id="guardar">Guardar tarjeta 🖼️</button>
+    </section>
+</main>
+
+<script>
+const ARTICULOS = [
+    { id:'iphone',  emoji:'📱', nombre:'un iPhone nuevo',      precio:6000000 },
+    { id:'ps5',     emoji:'🎮', nombre:'una PlayStation 5',    precio:2800000 },
+    { id:'perro',   emoji:'🐶', nombre:'un perro de raza',     precio:2500000 },
+    { id:'laptop',  emoji:'💻', nombre:'un portátil gamer',    precio:5000000 },
+    { id:'moto',    emoji:'🏍️', nombre:'una moto',             precio:12000000 },
+    { id:'viaje',   emoji:'✈️', nombre:'un viaje a Europa',    precio:15000000 },
+    { id:'boda',    emoji:'💍', nombre:'un matrimonio',        precio:30000000 },
+    { id:'carro',   emoji:'🚗', nombre:'un carro',             precio:70000000 },
+    { id:'apto',    emoji:'🏢', nombre:'un apartamento',       precio:350000000 },
+    { id:'casa',    emoji:'🏡', nombre:'una casa',             precio:600000000 },
+    { id:'otro',    emoji:'🎯', nombre:'eso que quieres',      precio:0 }
+];
+
+const $ = (id) => document.getElementById(id);
+const pesos = (n) => '$' + Math.round(n).toLocaleString('es-CO');
+const soloNumeros = (txt) => Number(String(txt).replace(/\D/g, '')) || 0;
+const reducir = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let textoCompartir = '';
+let ultimo = null;
+
+// Chips de artículos
+$('chips').innerHTML = ARTICULOS.map((a) => `
+    <label class="chip">
+        <input type="radio" name="articulo" value="${a.id}" ${a.id === 'moto' ? 'checked' : ''}>
+        <span>${a.emoji} ${a.id === 'otro' ? 'Otro' : a.nombre.replace(/^(un|una) /, '')}
+            <small>${a.precio ? 'aprox. ' + pesos(a.precio) : 'tú pones el precio'}</small></span>
+    </label>`).join('');
+
+// Formato de miles mientras escribe
+['sueldo', 'precio'].forEach(id => {
+    $(id).addEventListener('input', (e) => {
+        const n = soloNumeros(e.target.value);
+        e.target.value = n ? n.toLocaleString('es-CO') : '';
+    });
+});
+
+function articuloElegido() {
+    const id = document.querySelector('input[name="articulo"]:checked').value;
+    const a = ARTICULOS.find(x => x.id === id);
+    return { ...a, precio: soloNumeros($('precio').value) };
+}
+
+function textoTiempo(meses) {
+    const anios = Math.floor(meses / 12), resto = meses % 12;
+    const partes = [];
+    if (anios) partes.push(`${anios.toLocaleString('es-CO')} ${anios === 1 ? 'año' : 'años'}`);
+    if (resto) partes.push(`${resto} ${resto === 1 ? 'mes' : 'meses'}`);
+    return partes.join(' y ');
+}
+
+function chiste(meses) {
+    if (meses <= 1)   return 'Casi que ya lo tienes 😎';
+    if (meses <= 12)  return 'Esto sí es alcanzable. ¡A ahorrar! 💪';
+    if (meses <= 60)  return 'Se puede, pero toca disciplina 😅';
+    if (meses <= 240) return 'Uf... mejor ponte a invertir 😬';
+    return 'Toca heredar o ganarse el baloto 🍀💀';
+}
+
+function contar(el, hasta) {
+    if (reducir || hasta < 2) { el.textContent = hasta.toLocaleString('es-CO'); return; }
+    const inicio = performance.now(), duracion = 1400;
+    (function paso(t) {
+        const p = Math.min((t - inicio) / duracion, 1);
+        el.textContent = Math.round(hasta * (1 - Math.pow(1 - p, 3))).toLocaleString('es-CO');
+        if (p < 1) requestAnimationFrame(paso);
+    })(inicio);
+}
+
+function calcular(animar = true) {
+    const sueldo = soloNumeros($('sueldo').value);
+    const pct = Number($('pct').value);
+    const art = articuloElegido();
+    const edad = Number($('edad').value);
+
+    if (sueldo < 100000) { $('error').textContent = 'Escribe tu sueldo mensual (mínimo $100.000).'; return; }
+    if (art.precio < 1000) { $('error').textContent = 'Escribe cuánto cuesta lo que quieres comprar.'; return; }
+    $('error').textContent = '';
+
+    const ahorroMensual = sueldo * pct / 100;
+    const meses = Math.ceil(art.precio / ahorroMensual);
+    const anios = Math.floor(meses / 12);
+
+    $('resIntro').textContent = `Ahorrando ${pesos(ahorroMensual)} al mes (${pct}% de tu sueldo), para ${art.nombre} de ${pesos(art.precio)} te tardas:`;
+    $('unidad').textContent = anios ? (anios === 1 ? 'año' : 'años') : (meses === 1 ? 'mes' : 'meses');
+    $('resExtra').textContent = anios && meses % 12 ? `y ${meses % 12} ${meses % 12 === 1 ? 'mes' : 'meses'}` : '';
+    $('resChiste').textContent = chiste(meses);
+
+    if (edad >= 14 && edad <= 99) {
+        const edadFinal = edad + anios;
+        $('resEdad').textContent = edadFinal > 95
+            ? `Lo tendrías a los ${edadFinal} años... ni en tu próxima vida 💀`
+            : `Lo tendrías a los ${edadFinal} años 🫠`;
+    } else {
+        $('resEdad').textContent = '';
+    }
+
+    textoCompartir = `Ahorrando el ${pct}% de mi sueldo me tardo ${textoTiempo(meses)} en comprarme ${art.nombre} 😭 ¿Y tú? Calcúlalo:`;
+
+    ultimo = {
+        emoji: art.emoji, nombre: art.nombre, pct,
+        numero: (anios || meses).toLocaleString('es-CO'),
+        unidad: $('unidad').textContent, extra: $('resExtra').textContent,
+        edad: $('resEdad').textContent, chiste: $('resChiste').textContent
+    };
+
+    const res = $('resultado');
+    res.hidden = false;
+    if (animar) {
+        res.classList.remove('mostrar'); void res.offsetWidth; res.classList.add('mostrar');
+        res.scrollIntoView({ behavior: reducir ? 'auto' : 'smooth', block: 'center' });
+    }
+    contar($('num'), anios || meses);
+}
+
+$('form').addEventListener('submit', (e) => { e.preventDefault(); calcular(true); });
+
+$('pct').addEventListener('input', () => {
+    $('pctTxt').textContent = $('pct').value + '%';
+    if (!$('resultado').hidden) calcular(false);
+});
+
+function cargarPrecioSugerido() {
+    const id = document.querySelector('input[name="articulo"]:checked').value;
+    const a = ARTICULOS.find(x => x.id === id);
+    $('precio').value = a.precio ? a.precio.toLocaleString('es-CO') : '';
+    $('precioLabel').textContent = id === 'otro'
+        ? '¿Cuánto cuesta lo que quieres? (en pesos)'
+        : `¿Cuánto cuesta ${a.nombre}? Cámbialo si quieres`;
+    if (!$('resultado').hidden && a.precio) calcular(false);
+}
+
+document.querySelectorAll('input[name="articulo"]').forEach(r => r.addEventListener('change', cargarPrecioSugerido));
+
+// Si ya hay un resultado, se actualiza en vivo al editar el precio
+$('precio').addEventListener('input', () => {
+    if (!$('resultado').hidden) calcular(false);
+});
+
+cargarPrecioSugerido();
+
+$('compartir').addEventListener('click', async () => {
+    try {
+        if (navigator.share) {
+            await navigator.share({ text: textoCompartir, url: location.href });
+        } else {
+            await navigator.clipboard.writeText(`${textoCompartir} ${location.href}`);
+            $('compartir').textContent = '¡Copiado! ✅';
+            setTimeout(() => { $('compartir').textContent = 'Compartir 📲'; }, 1600);
+        }
+    } catch { /* el usuario canceló */ }
+});
+
+/* ---------- TARJETA PARA COMPARTIR (imagen 1080x1920) ---------- */
+function envolverTexto(ctx, texto, x, y, ancho, alto) {
+    let linea = '';
+    texto.split(' ').forEach(palabra => {
+        const prueba = linea ? linea + ' ' + palabra : palabra;
+        if (ctx.measureText(prueba).width > ancho && linea) {
+            ctx.fillText(linea, x, y);
+            linea = palabra;
+            y += alto;
+        } else {
+            linea = prueba;
+        }
+    });
+    ctx.fillText(linea, x, y);
+    return y + alto;
+}
+
+function dibujarTarjeta(r) {
+    const W = 1080, H = 1920, cx = W / 2;
+    const canvas = document.createElement('canvas');
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext('2d');
+    ctx.textAlign = 'center';
+    const fuente = (peso, px) => `${peso} ${px}px system-ui, "Segoe UI", Arial, "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
+
+    // Fondo
+    const fondo = ctx.createLinearGradient(0, 0, 0, H);
+    fondo.addColorStop(0, '#242438');
+    fondo.addColorStop(1, '#0b0b0f');
+    ctx.fillStyle = fondo;
+    ctx.fillRect(0, 0, W, H);
+
+    // Título
+    ctx.fillStyle = '#b6ff3b';
+    ctx.font = fuente(800, 44);
+    ctx.fillText('¿CUÁNTO TARDAS EN COMPRARTE...?', cx, 190);
+
+    // Emoji
+    ctx.font = fuente(400, 260);
+    ctx.fillStyle = '#fff';
+    ctx.fillText(r.emoji, cx, 520);
+
+    // Introducción
+    ctx.fillStyle = '#ffffff';
+    ctx.font = fuente(800, 64);
+    let y = envolverTexto(ctx, `Para comprarme ${r.nombre}`, cx, 700, 900, 78);
+    ctx.fillStyle = '#9a9aab';
+    ctx.font = fuente(500, 44);
+    envolverTexto(ctx, `ahorrando el ${r.pct}% de mi sueldo me tardo:`, cx, y + 10, 900, 56);
+
+    // Número grande con degradado (se achica si es muy largo)
+    let tam = 320;
+    ctx.font = fuente(900, tam);
+    while (ctx.measureText(r.numero).width > 880 && tam > 100) {
+        tam -= 10;
+        ctx.font = fuente(900, tam);
+    }
+    const ancho = ctx.measureText(r.numero).width;
+    const grad = ctx.createLinearGradient(cx - ancho / 2, 0, cx + ancho / 2, 0);
+    grad.addColorStop(0, '#b6ff3b');
+    grad.addColorStop(1, '#ff3d81');
+    ctx.fillStyle = grad;
+    ctx.fillText(r.numero, cx, 1160);
+
+    // Unidad y meses sueltos
+    ctx.fillStyle = '#ffffff';
+    ctx.font = fuente(800, 84);
+    ctx.fillText(r.unidad, cx, 1270);
+    if (r.extra) {
+        ctx.font = fuente(600, 60);
+        ctx.fillText(r.extra, cx, 1350);
+    }
+
+    // Edad y chiste
+    ctx.fillStyle = '#9a9aab';
+    ctx.font = fuente(600, 52);
+    if (r.edad) envolverTexto(ctx, r.edad, cx, 1470, 900, 66);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = fuente(800, 60);
+    envolverTexto(ctx, r.chiste, cx, 1600, 900, 74);
+
+    // Pie
+    ctx.fillStyle = '#b6ff3b';
+    ctx.font = fuente(800, 54);
+    ctx.fillText('Calcula el tuyo 👇', cx, 1760);
+    if (location.protocol.startsWith('http')) {
+        ctx.fillStyle = '#9a9aab';
+        ctx.font = fuente(500, 40);
+        ctx.fillText(location.host + location.pathname.replace(/index\.html$/, ''), cx, 1830);
+    }
+    return canvas;
+}
+
+$('guardar').addEventListener('click', async () => {
+    if (!ultimo) return;
+    const blob = await new Promise(res => dibujarTarjeta(ultimo).toBlob(res, 'image/png'));
+    const archivo = new File([blob], 'cuanto-tardas.png', { type: 'image/png' });
+
+    // En el celular: menú de compartir con la imagen (TikTok, WhatsApp, historias...)
+    try {
+        if (navigator.canShare && navigator.canShare({ files: [archivo] })) {
+            await navigator.share({ files: [archivo], text: textoCompartir });
+            return;
+        }
+    } catch { return; /* canceló */ }
+
+    // En el computador: descarga la imagen
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'cuanto-tardas.png';
+    a.click();
+    URL.revokeObjectURL(url);
+});
+</script>
+</body>
+</html>
